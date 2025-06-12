@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Body
 
-from schemas.hotels import HotelsAdd
-from sqlalchemy.orm import defer
+from src.schemas.hotels import HotelsAdd
+
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
@@ -18,5 +18,24 @@ async def get_hotels(
     return {'hotels': title, 'location': location}
 
 @router.post("")
-async def add_hotel() -> dict:
-    pass
+async def add_hotel(
+    hotel_data: HotelsAdd = Body(
+        openapi_examples={
+            "1": {
+                "summary": "Сочи",
+                "value": {
+                    "title": "Resourt 5 stars",
+                    "location": "Сочи, ул.Приморская, 10",
+                },
+            },
+            "2": {
+                "summary": "Дубай",
+                "value": {
+                    "title": "Arabian beach",
+                    "location": "Дубай, ул.Шейха, 3",
+                },
+            }
+        }
+    )
+) -> dict:
+    return {"status": "ok", "data": hotel_data}
