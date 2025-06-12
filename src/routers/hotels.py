@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Query, Body
+import asyncio
 
 from src.schemas.hotels import HotelsAdd
+from src.database import call_stored_proc
 
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
@@ -36,6 +38,8 @@ async def add_hotel(
                 },
             }
         }
-    )
-) -> dict:
-    return {"status": "ok", "data": hotel_data}
+    ),
+    db_object = 'SELECT sch_hotels.f_add_hotels($1)',
+):
+    hotel = await call_stored_proc(db_object, hotel_data.model_dump_json())
+    return {"data": hotel}

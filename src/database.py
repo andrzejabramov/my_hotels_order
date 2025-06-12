@@ -2,19 +2,16 @@ import asyncio
 import asyncpg
 import json
 
-from settings import settings
+from src.config import DB_URL
 
 
-url = settings.DB_URL()
-
-async def call_stored_proc():
-    params = '{"title": " Мармарис", "location": "Мармарис, ул. Южная, 15"}'
+async def call_stored_proc(db_object, params, url = DB_URL):
     conn = await asyncpg.connect(url)
-    res = await conn.fetch('''SELECT "sch_hotels"."f_add_hotels"($1)''', params)
-    print(res)
+    res = await conn.fetch(db_object, params)
     await conn.close()
+    return res
 
-asyncio.run(call_stored_proc())
+#asyncio.run(call_stored_proc(db_object, params))
 #---------------------
 # pool = await asyncpg.create_pool(
 #     user='postgres',
@@ -37,13 +34,4 @@ asyncio.run(call_stored_proc())
 #
 #     except asyncpg.PostgresError as e:
 #         print(f"Произошла ошибка: {e}")
-#
-# Настройка работы с JSON типом
-# await conn.set_type_codec(
-#     'json',
-#     encoder=json.dumps,
-#     decoder=json.loads,
-#     schema='pg_catalog'
-# )
-#
-#
+
